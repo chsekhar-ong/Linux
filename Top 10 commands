@@ -1,0 +1,298 @@
+top -- provides dynamic output for running process and its system resource utilization like cpu,memory, command responsible for it.
+ps aux --provides static output of running process and its system resource utilization like cpu,memory,command responsible for it.
+
+ps -- process running in current shell
+----------------------------------------
+output :   PID TTY          TIME CMD
+ 4650 pts/1    00:00:00 su
+ 4653 pts/1    00:00:00 bash
+ 4822 pts/1    00:00:00 ps
+----------------------------------------
+
+pgrep bash
+----------------------------------
+output:  pgrep su
+         774
+         3991
+         4650
+----------------------------------
+
+pstree -p ---> provides hierarchy of the process and where it running
+
+lsblk---> list block storages in the system
+---------------------------------------------------------------------------------------------
+NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda           8:0    0 465.8G  0 disk 
+├─sda1        8:1    0   512M  0 part /boot/efi
+└─sda2        8:2    0 465.3G  0 part /
+sdb           8:16   0   1.8T  0 disk   # <-- New disk (no partitions yet)         // here sdb is new disk space available as block storage
+----------------------------------------------------------------------------------------------
+
+
+create partion from available block storage (disk sdb)
+fdisk -n /dev/sdb
+------------------------------------
+Press n → New Partition
+Press p → Primary Partition (or e for Extended)
+Press 1 → Partition Number
+Press Enter → First Sector (default)
+Press Enter → Last Sector (default = full disk)
+Press t → Change Partition Type (optional, 83 for Linux)
+Press w → Write Changes
+------------------------------------
+
+format the partion as per  certain system requirement
+--------------------------------------------------------
+Choose a filesystem (ext4, xfs, btrfs, etc.) and format:
+--------------------------------------------------------
+mkfs.ext4 /dev/sdb1 (or) mkfs.xfs /dev/sdb1 (or) mkfs.ntfs /dev/sdb1
+
+
+mount the formatted partion on the file system 
+------------------------------------------
+ mkdir /mnt/newapp
+ mount /dev/sdb1 /mnt/mydisk
+
+check mount on file system
+========================================================
+df -h
+Filesystem           Size  Used Avail Use% Mounted on
+/dev/mapper/ol-root   50G   11G   40G  21% /
+devtmpfs             1.4G     0  1.4G   0% /dev
+tmpfs                1.4G  156K  1.4G   1% /dev/shm
+tmpfs                1.4G  8.9M  1.4G   1% /run
+tmpfs                1.4G     0  1.4G   0% /sys/fs/cgroup
+/dev/sda1            497M  267M  230M  54% /boot
+/dev/mapper/ol-home   67G   81M   67G   1% /home
+tmpfs                276M   12K  276M   1% /run/user/1001
+tmpfs                276M     0  276M   0% /run/user/0
+
+========================================================
+------------------------------------------
+
+
+
+---------------------------------------
+Permanent Mount (via /etc/fstab)
+---------------------------------------
+Get the UUID (recommended for stability):
+
+lsblk
+--------------------------------------------------
+NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda           8:0    0   120G  0 disk 
+├─sda1        8:1    0   500M  0 part /boot
+└─sda2        8:2    0 119.5G  0 part 
+  ├─ol-root 252:0    0    50G  0 lvm  /
+  ├─ol-swap 252:1    0     3G  0 lvm  [SWAP]
+  └─ol-home 252:2    0  66.5G  0 lvm  /home
+sr0          11:0    1  1024M  0 rom  
+--------------------------------------------------
+
+
+blkid /dev/sda2
+/dev/sda2: UUID="8c5lF1-Y0KK-rImv-vzP8-VYIQ-iPTk-z07hIb" TYPE="LVM2_member" 
+
+
+Edit /etc/fstab:  (file system table)
+--------------------------------------------------------------
+Add this line (replace UUID and /mnt/newapp):
+
+bash
+UUID=1234-5678-90AB  /mnt/newapp  ext4  defaults  0  2
+--------------------------------------------------------------
+
+
+Apply changes:
+----------------------
+sudo mount -a
+----------------------
+
+4. How to Remove an fstab Entry
+Open fstab:
+-------------------------------------------------------
+vi /etc/fstab
+
+Delete the line for the disk you want to unmount.
+
+Test:
+ mount -a
+------------------------------------------------------
+
+or  (Optional) Remove the mount point:
+----------------------------------
+rmdir /mnt/data
+----------------------------------
+
+tcpdump--->if client unable to access the application running on the server or (latency) then check the application port is able to accept the request or not(provides network package information at any ip and port)
+------------------------------------------------------------------------------------------------------------
+tcpdump -i enX0 -->list all availble network packages in the network.
+tcpdump -i enX0 port 80
+
+ifconfig ---->
+
+ifconfig
+enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.0.79  netmask 255.255.255.0  broadcast 10.0.0.255
+        inet6 2401:4900:1cb2:9f28:a00:27ff:fe5b:439d  prefixlen 128  scopeid 0x0<global>
+        inet6 fe80::a00:27ff:fe5b:439d  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:5b:43:9d  txqueuelen 1000  (Ethernet)
+        RX packets 18777  bytes 2151478 (2.0 MiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 361  bytes 33174 (32.3 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 0  (Local Loopback)
+        RX packets 12  bytes 1020 (1020.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 12  bytes 1020 (1020.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
+        ether 52:54:00:64:87:fd  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 6  bytes 1172 (1.1 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+tcpdump -i enp0s3 port 80
+-------------------------------------------------------------------------------------------------------------
+
+MEMORY UTILIZATION
+==================
+ free -h 
+--------------------------------------------------------------------------------------------
+total        used        free      shared  buff/cache   available
+Mem:           2.7G        555M        1.6G         10M        577M        2.1G
+Swap:          3.0G          0B        3.0G
+--------------------------------------------------------------------------------------------
+
+NETWORK UTILIZATION
+===================
+netstat -tulnp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 192.168.122.1:53        0.0.0.0:*               LISTEN      2496/dnsmasq        
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      986/sshd            
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      3290/cupsd          
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      2322/master         
+tcp6       0      0 :::512                  :::*                    LISTEN      996/xinetd          
+tcp6       0      0 :::3306                 :::*                    LISTEN      2263/mysqld         
+tcp6       0      0 :::22                   :::*                    LISTEN      986/sshd            
+tcp6       0      0 ::1:631                 :::*                    LISTEN      3290/cupsd          
+tcp6       0      0 ::1:25                  :::*                    LISTEN      2322/master         
+udp        0      0 192.168.122.1:53        0.0.0.0:*                           2496/dnsmasq        
+udp        0      0 0.0.0.0:36926           0.0.0.0:*                           775/dhclient        
+udp        0      0 0.0.0.0:67              0.0.0.0:*                           2496/dnsmasq        
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           775/dhclient        
+udp        0      0 127.0.0.1:323           0.0.0.0:*                           1002/chronyd        
+udp        0      0 0.0.0.0:49800           0.0.0.0:*                           683/avahi-daemon: r 
+udp        0      0 0.0.0.0:5353            0.0.0.0:*                           683/avahi-daemon: r 
+udp6       0      0 ::1:323                 :::*                                1002/chronyd        
+udp6       0      0 :::2892                 :::*                                775/dhclient     
+
+To get process running on this particular port
+================================================
+lsof -i :631 (list of open files)
+---------------------------------------------------------------------------
+COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+cupsd   3290 root   12u  IPv6  28058      0t0  TCP localhost:ipp (LISTEN)
+cupsd   3290 root   13u  IPv4  28059      0t0  TCP localhost:ipp (LISTEN)
+----------------------------------------------------------------------------
+
+
+(Shortcut keys)
+------------------------------------------------------------------------------------------------------------------------------------
+when searching for previously executed commands we go for this command:
+history (which result something like 500 commands)
+                   -----------------
+To list this:------- history 500
+                   -----------------
+Instead go for 
+--------------------------
+CTRL+r
+--------------------------
+next : search for command you remember it exists in history it throw you entire command list of referenced command in history.
+-------------------------------------------------------------------------------------------------------------------------------
+=============
+ history 130
+=============
+   50  systemctl disable firewalld
+   51  id
+   52  less /etc/hostname
+   53  vi /etc/hosts
+   54  cd /etc/sysconfig
+   55  ls
+   56  ls network
+   57  ls -l network
+   58  vi network
+   59  hostname
+   60  cat /etc/sysconfig/network
+   61  vi /etc/sysconfig/network
+   62  hostname
+   63  vi /etc/hosts
+   64  cd /etc/system
+   65  cd /etc/sysconfig
+   66  ls
+   67  less network
+   68  less /etc/hostname
+   81  exit
+   82  vi /etc/sysctl.conf
+   83  /sbin/sysctl -p
+   84  yum install google-chrome
+   85  yum install google-chrome-stable
+   86  cd /etc/yum.repos.d
+   87  vi google.repo
+   88  yum install google-chrome-stable
+   89  vi /var/cache/yum/
+   90  cd /var/cache/yum/
+   91  ls
+   92  cd x86_64/
+  106  cal
+  107  cd /
+  108  ls
+  109  exec bash
+  110  top
+  111  ps aux
+  112  ps
+  113  pgrep bash
+  114  pgrep su
+  115  pstree 
+  116  pstree -p
+  117  lsblk
+  118  df -h
+  119  blkid /dev/sda2
+  120  vi /etc/fstab 
+  121  tcpdump -i enX0 80
+  128  df -h
+  129  free -h
+  130  netstat -tulnp
+  131  lsof -i :631
+  
+here say CTRL +r prompt you to enter the command you wanna search 
+ls
+it find ls command but command (lsof) you searching for is similar to ls but not ls
+so ,again press CTRL+r again and again untill you find your command .
+------------------------------------------------------------------------------------------------------------------------------------
+
+------------
+| shortCUT |
+------------
+
+[root@mqmhost ~]# 
+              ------------    ----------
+To check this root@mqmhost to APRILFOOL
+              ------------    ----------
+=============================
+export PS1="APRILFOOL $: "
+=============================
+
+
+
+
+
+
