@@ -1,4 +1,9 @@
-top -- provides dynamic output for running process and its system resource utilization like cpu,memory, command responsible for it.
+(SYSTEM UTILIZATION)
+----------------------
+htop,top -- provides dynamic output for running process and its system resource utilization like cpu,memory, command responsible for it.
+
+PROCESS MONITORING)
+---------------------
 ps aux --provides static output of running process and its system resource utilization like cpu,memory,command responsible for it.
 
 ps -- process running in current shell
@@ -124,6 +129,8 @@ or  (Optional) Remove the mount point:
 rmdir /mnt/data
 ----------------------------------
 
+(NETWORK MONITORING)
+netstat -tulnp
 tcpdump--->if client unable to access the application running on the server or (latency) then check the application port is able to accept the request or not(provides network package information at any ip and port)
 ------------------------------------------------------------------------------------------------------------
 tcpdump -i enX0 -->list all availble network packages in the network.
@@ -203,6 +210,14 @@ COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 cupsd   3290 root   12u  IPv6  28058      0t0  TCP localhost:ipp (LISTEN)
 cupsd   3290 root   13u  IPv4  28059      0t0  TCP localhost:ipp (LISTEN)
 ----------------------------------------------------------------------------
+
+
+(SYSTEM SERVICE LOGS)
+---------------------------------
+journalctl -u servicename
+---------------------------------
+
+
 
 
 (Shortcut keys)
