@@ -306,6 +306,13 @@ To check this root@mqmhost to APRILFOOL
 export PS1="APRILFOOL $: "
 =============================
 
+To restore your default prompt:
+------------------------------------
+PS1="[\u@\h \W]\$ "
+------------------------------------
+
+
+
 
 
 
